@@ -26,7 +26,7 @@ func SetUpApplicationLogs() {
 	// currentTimestamp := time.Now().Format("2006-01-02") // YYYY-MM-DD format
 
 	// Dynamically generate the log file name with the current timestamp
-	logFileName := constants.ApplicationConfig.Application.LogPath + "goBulkCampaignService.log"
+	logFileName := constants.ApplicationConfig.Application.LogPath + "urlShortener.log"
 	// file, err := os.OpenFile("./logs/logfile.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 
 	logFile := &lumberjack.Logger{

@@ -1,6 +1,6 @@
 {
     "database": {
-      "host": "localhost",
+      "host": "127.0.0.1",
       "port": "3306",
       "username": "hiteshm",
       "password": "qwerty",
@@ -13,13 +13,7 @@
         "password": ""
       },
       "application" :{
-        "logPath":"/var/log/goBulkCampaignService/",
-        "chanlen" :"1",
-        "filePath":"/opt/transmail/cpaas_api/campaign/",
-        "batchSize":"1000",
-        "apiUrl":"http://soipapi-qa.netcorecloud.net/soip/rcs/v2/smarttech/message",
-        "offTimeStart" :"22:00",
-        "offTimeEnd" : "07:00"
+        "logPath":"/var/log/urlShortner/"
       }
   
   }

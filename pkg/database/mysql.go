@@ -12,7 +12,7 @@ import (
 var DbConn *sql.DB
 
 func EstablishDbConnection() {
-	logs.InfoLog("Establishing DB connection")
+	fmt.Println("Establishing DB connection")
 	host := constants.ApplicationConfig.Database.Host
 	port := constants.ApplicationConfig.Database.Port
 	username := constants.ApplicationConfig.Database.Username
@@ -21,24 +21,24 @@ func EstablishDbConnection() {
 	// fmt.Println("HEREE")
 	// fmt.Println(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbname))
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbname))
-	logs.InfoLog(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbname))
+	fmt.Println(fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, dbname))
 	if err != nil {
 		logs.InfoLog(err.Error())
 	}
 	// defer db.Close()
-	logs.InfoLog("Conn opened")
+	fmt.Println("Conn opened")
 	// Check the database connection
-	logs.InfoLog("Ping check ")
+	fmt.Println("Ping check ")
 	err = db.Ping()
-	logs.InfoLog("Ping checked")
+	fmt.Println("Ping checked")
 
 	if err != nil {
 		// logs.InfoLog(err.Error())
-		logs.ErrorLog("Not connected %v", err)
+		fmt.Println("Not connected %v", err)
 		return
 	}
 
 	DbConn = db
-	logs.InfoLog("Connected to the database")
+	fmt.Println("Connected to the database")
 
 }

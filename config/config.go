@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"main/logs"
+	"main/pkg/constants"
 	"main/pkg/database"
 	models "main/pkg/models/configModel"
 
@@ -13,9 +14,11 @@ func SetUpApplication() {
 	fmt.Println("SetUp config details....")
 	setupConfig()
 	fmt.Println("SettingUp Logs....")
-	setUpApplicationLogs()
+	// setUpApplicationLogs()
 	setUpApplicationDatabase()
 	fmt.Println("DB set up done")
+	setUpRedis()
+	fmt.Println("Redis set up done")
 }
 
 func setupConfig() {
@@ -35,6 +38,8 @@ func setupConfig() {
 		fmt.Println("Error to unmarshal config")
 	}
 
+	constants.ApplicationConfig = &config
+
 }
 
 func setUpApplicationLogs() {
@@ -43,4 +48,8 @@ func setUpApplicationLogs() {
 
 func setUpApplicationDatabase() {
 	database.EstablishDbConnection()
+}
+
+func setUpRedis() {
+	database.SetUpRedis()
 }
