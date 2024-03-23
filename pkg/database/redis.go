@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"main/pkg/constants"
 
@@ -13,9 +14,9 @@ var RedisClient *redis.Client
 var ctx = context.Background()
 
 func SetUpRedis() {
-	log.Println("In setup redis  func")
+	fmt.Println("In setup redis  func")
 	RedisClient = EstablishConn()
-	log.Println("Redis COnnection is Established Succesfully", RedisClient)
+	fmt.Println("Redis COnnection is Established Succesfully", RedisClient)
 
 }
 
