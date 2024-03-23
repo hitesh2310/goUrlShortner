@@ -101,3 +101,20 @@ func GetCount() (int, error) {
 	fmt.Println("Row count:", count)
 	return count, nil
 }
+
+func GetEntry(shortUrl string) string {
+	query := "SELECT longUrl FROM url_mapping WHERE shortUrl = ?"
+	var longURL string
+	err := DbConn.QueryRow(query, shortUrl).Scan(&longURL)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println("No matching record found")
+			return ""
+		} else {
+			log.Fatal(err)
+			return ""
+		}
+	}
+
+	return longURL
+}

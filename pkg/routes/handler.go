@@ -24,7 +24,21 @@ func RedirectHandler(c *gin.Context) {
 	if err != nil {
 		fmt.Println("Error getting url mapping from cache: ", err)
 		//check DB
-		// database.GetEntry(shortUrl)
+		longUrl := database.GetEntry(shortUrl)
+		if longUrl == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid URL"})
+			return
+		}
+		cacheEntry.LongUrl = longUrl
+		cacheEntry.EpochTime = int(time.Now().Unix())
+		//adding to redis cache
+		cacheEntryByte, err := json.Marshal(cacheEntry)
+		if err != nil {
+			fmt.Println("Failed to marshal cache entry")
+		}
+		cacheEntryString := string(cacheEntryByte)
+		database.HSetShortLongMapping("url_mapping", shortUrl, cacheEntryString)
+
 	} else {
 		json.Unmarshal([]byte(cacheString), &cacheEntry)
 		fmt.Println("CACHE ENTRY::", cacheEntry)
