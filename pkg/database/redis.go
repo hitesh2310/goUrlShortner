@@ -51,7 +51,7 @@ func HGet(key, field string) (string, error) {
 	return val, err
 }
 
-func HSet(key, field, value string) error {
+func HSetShortLongMapping(key, field, value string) error {
 	if RedisClient == nil {
 		RedisClient = GetRedisConn()
 	}

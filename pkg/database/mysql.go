@@ -6,6 +6,7 @@ import (
 	"log"
 	"main/logs"
 	"main/pkg/constants"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -35,7 +36,7 @@ func EstablishDbConnection() {
 
 	if err != nil {
 		// logs.InfoLog(err.Error())
-		fmt.Println("Not connected %v", err)
+		fmt.Println("Not connected ::", err)
 		return
 	}
 
@@ -47,13 +48,17 @@ func EstablishDbConnection() {
 func AddEntry(longUrl, shortUrl string) error {
 
 	// query := fmt.Sprintf("INSERT INTO url_mapping (long_url, short_url) VALUES (%s,%s)", longUrl, shortUrl)
-	stmt, err := DbConn.Prepare("INSERT INTO url_mapping (longUrl, shortUrl) VALUES (?,?)")
+	stmt, err := DbConn.Prepare("INSERT INTO url_mapping (longUrl, shortUrl,createdAt) VALUES (?,?,?)")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(longUrl, shortUrl)
+	currentTime := time.Now()
+
+	epochTime := currentTime.Unix()
+
+	_, err = stmt.Exec(longUrl, shortUrl, epochTime)
 	if err != nil {
 		fmt.Println("Error executing the query::", err)
 		return err

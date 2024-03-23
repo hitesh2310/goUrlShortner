@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"main/pkg/constants"
 	"main/pkg/database"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +18,19 @@ func RedirectHandler(c *gin.Context) {
 
 	fmt.Println("code check ", c.Request.URL.RequestURI())
 	// c.Header("content-type", "html")
-	c.Redirect(http.StatusSeeOther, "http://www.google.com")
+	shortUrl := c.Request.URL.RequestURI()
+	var cacheEntry models.RedisEntry
+	cacheString, err := database.HGet("url_mapping", shortUrl[1:])
+	if err != nil {
+		fmt.Println("Error getting url mapping from cache: ", err)
+		//check DB
+		// database.GetEntry(shortUrl)
+	} else {
+		json.Unmarshal([]byte(cacheString), &cacheEntry)
+		fmt.Println("CACHE ENTRY::", cacheEntry)
+	}
+
+	c.Redirect(http.StatusSeeOther, cacheEntry.LongUrl)
 
 }
 
@@ -57,7 +71,7 @@ func ShortenURLHandler(c *gin.Context) {
 				return
 			} else {
 				fmt.Println("Got short url from database")
-				c.JSON(http.StatusOK, gin.H{"shortUrl": "localhost:8081/short/" + shortUrl})
+				c.JSON(http.StatusOK, gin.H{"shortUrl": "localhost:8081/" + shortUrl})
 				return
 			}
 		} else {
@@ -67,7 +81,20 @@ func ShortenURLHandler(c *gin.Context) {
 	constants.GlobalMutex.Lock()
 	constants.Counter++
 	constants.GlobalMutex.Unlock()
-	c.JSON(http.StatusOK, gin.H{"shortUrl": "localhost:8081/short/" + encodedString})
+
+	//Add to Cache
+	var cacheEntry models.RedisEntry
+	cacheEntry.LongUrl = req.Url
+	cacheEntry.EpochTime = int(time.Now().Unix())
+
+	cacheEntryByte, err := json.Marshal(cacheEntry)
+	if err != nil {
+		fmt.Println("Failed to marshal cache entry")
+	}
+	cacheEntryString := string(cacheEntryByte)
+	database.HSetShortLongMapping("url_mapping", encodedString, cacheEntryString)
+
+	c.JSON(http.StatusOK, gin.H{"shortUrl": "localhost:8081/" + encodedString})
 }
 
 func isValidURL(input string) bool {
