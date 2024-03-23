@@ -33,9 +33,31 @@ func EstablishConn() *redis.Client {
 func GetRedisConn() *redis.Client {
 
 	if RedisClient != nil {
-		return EstablishConn()
-	} else {
 		return RedisClient
+	} else {
+		return EstablishConn()
 	}
 
+}
+
+func HGet(key, field string) (string, error) {
+	if RedisClient == nil {
+		RedisClient = GetRedisConn()
+	}
+	val, err := RedisClient.HGet(ctx, key, field).Result()
+	if err != nil {
+		log.Printf("Error retrieving value from Redis hash: %v\n", err)
+	}
+	return val, err
+}
+
+func HSet(key, field, value string) error {
+	if RedisClient == nil {
+		RedisClient = GetRedisConn()
+	}
+	err := RedisClient.HSet(ctx, key, field, value).Err()
+	if err != nil {
+		log.Printf("Error setting value in Redis hash: %v\n", err)
+	}
+	return err
 }

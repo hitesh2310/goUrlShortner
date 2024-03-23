@@ -19,6 +19,9 @@ func SetUpApplication() {
 	fmt.Println("DB set up done")
 	setUpRedis()
 	fmt.Println("Redis set up done")
+	// update counter
+	updateCounter()
+
 }
 
 func setupConfig() {
@@ -52,4 +55,19 @@ func setUpApplicationDatabase() {
 
 func setUpRedis() {
 	database.SetUpRedis()
+}
+
+func updateCounter() {
+
+	count, err := database.GetCount()
+	if err != nil {
+		fmt.Println("Error to get count from DB", err)
+		return
+	} else {
+		fmt.Println("Got count from database::", count)
+		constants.Counter = count + 1
+		fmt.Println("application conter ::", constants.Counter)
+
+	}
+
 }
