@@ -71,3 +71,7 @@ func updateCounter() {
 	}
 
 }
+
+func AddHostEntry(host string) {
+
+}

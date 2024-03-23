@@ -6,6 +6,7 @@ import (
 	"log"
 	"main/logs"
 	"main/pkg/constants"
+	"net/url"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -117,4 +118,49 @@ func GetEntry(shortUrl string) string {
 	}
 
 	return longURL
+}
+
+func IncrementHost(longURL string) {
+	parsedURL, err := url.Parse(longURL)
+	if err != nil {
+		fmt.Println("Error parsing URL:", err)
+		return
+	}
+
+	host := parsedURL.Host
+
+	// Prepare the SQL statement
+	stmt, err := DbConn.Prepare("INSERT INTO host_stats (host, count) VALUES (?, 1) ON DUPLICATE KEY UPDATE count = count + 1")
+	if err != nil {
+		fmt.Println("Error to prepare query::", err.Error())
+	}
+	defer stmt.Close()
+
+	// Execute the SQL statement
+	_, err = stmt.Exec(host)
+	if err != nil {
+		fmt.Println("Error to execute the query::", err.Error())
+	}
+}
+
+func GetTop3() []string {
+	fmt.Println("COde check top")
+	var result []string
+	query := "SELECT host FROM host_stats ORDER BY count DESC LIMIT 3"
+	rows, err := DbConn.Query(query)
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var host string
+		err := rows.Scan(&host)
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Println("Host:", host)
+		result = append(result, host)
+	}
+	return result
 }

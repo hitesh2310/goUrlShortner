@@ -16,8 +16,9 @@ func init() {
 func main() {
 	fmt.Println("Server starting!")
 	router := gin.Default()
-	router.GET("/*path", handlers.RedirectHandler)
+	router.GET("/stat", handlers.StatHandler)
 	router.POST("/shorten", handlers.ShortenURLHandler)
+	router.GET("/:path", handlers.RedirectHandler)
 
 	router.Run(":8081")
 

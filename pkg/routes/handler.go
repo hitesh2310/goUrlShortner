@@ -49,7 +49,7 @@ func RedirectHandler(c *gin.Context) {
 }
 
 func ShortenURLHandler(c *gin.Context) {
-
+	database.GetTop3()
 	var req models.Request
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -107,8 +107,9 @@ func ShortenURLHandler(c *gin.Context) {
 	}
 	cacheEntryString := string(cacheEntryByte)
 	database.HSetShortLongMapping("url_mapping", encodedString, cacheEntryString)
-
+	database.IncrementHost(req.Url)
 	c.JSON(http.StatusOK, gin.H{"shortUrl": "localhost:8081/" + encodedString})
+
 }
 
 func isValidURL(input string) bool {
@@ -134,4 +135,11 @@ func EncodeBase62(num int) string {
 		num = num / base
 	}
 	return result
+}
+
+func StatHandler(c *gin.Context) {
+
+	result := database.GetTop3()
+	c.JSON(http.StatusOK, gin.H{"result": result})
+
 }
