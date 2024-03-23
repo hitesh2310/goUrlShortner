@@ -1,0 +1,41 @@
+goURLShortner 
+
+Plan 
+1. Application will have two endpoints 
+     1.  POST  /short 
+            it will have payload like below 
+                {
+                   url : "www.google.com"              // validation of valid URL 
+                   shortPattern : ""                //optional,   can use md5
+                }
+  		
+
+  		  case1: 
+               URL : www.google.com       // primary key not null   
+               id:   100000               // auto increment 
+               encode string : 6eu        // unique, no check
+
+
+
+
+DB urlShortner  
+        links
+           id(int, primary auto increment), longUrl (varchar 1500, unique), shortUrl(15 unique), createdAt ()
+        metrics
+           id (int ), host(varchar 100), count (int)
+
+Redis Cache
+       key -> shortUrl 
+       value -> {"longUrl":"www.google.com","createdAt","time"}
+
+
+
+     2. GET  /xyz 
+             it will check for long URL in cache first, it not found in cache will fallback check in DB.
+             once the long URL found, it will redirect to original URL.
+
+
+     3. Service to maintain cache 
+
+
+
