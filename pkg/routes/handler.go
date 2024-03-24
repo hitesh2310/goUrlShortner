@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"main/logs"
 	"main/pkg/constants"
 	"main/pkg/database"
 	"main/pkg/models"
@@ -16,13 +16,13 @@ import (
 
 func RedirectHandler(c *gin.Context) {
 
-	fmt.Println("code check ", c.Request.URL.RequestURI())
-	// c.Header("content-type", "html")
+	logs.InfoLog("URI::%v", c.Request.URL.RequestURI())
+
 	shortUrl := c.Request.URL.RequestURI()
 	var cacheEntry models.RedisEntry
 	cacheString, err := database.HGet("url_mapping", shortUrl[1:])
 	if err != nil {
-		fmt.Println("Error getting url mapping from cache: ", err)
+		logs.ErrorLog("Error getting url mapping from cache: %v", err)
 		//check DB
 		longUrl := database.GetEntry(shortUrl)
 		if longUrl == "" {
@@ -34,14 +34,14 @@ func RedirectHandler(c *gin.Context) {
 		//adding to redis cache
 		cacheEntryByte, err := json.Marshal(cacheEntry)
 		if err != nil {
-			fmt.Println("Failed to marshal cache entry")
+			logs.ErrorLog("Failed to marshal cache entry")
 		}
 		cacheEntryString := string(cacheEntryByte)
 		database.HSetShortLongMapping("url_mapping", shortUrl, cacheEntryString)
 
 	} else {
 		json.Unmarshal([]byte(cacheString), &cacheEntry)
-		fmt.Println("CACHE ENTRY::", cacheEntry)
+		logs.InfoLog("CACHE ENTRY::", cacheEntry)
 	}
 
 	c.Redirect(http.StatusSeeOther, cacheEntry.LongUrl)
@@ -49,7 +49,6 @@ func RedirectHandler(c *gin.Context) {
 }
 
 func ShortenURLHandler(c *gin.Context) {
-	database.GetTop3()
 	var req models.Request
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -67,12 +66,12 @@ func ShortenURLHandler(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Request recieved: ", req)
-	fmt.Println("Curent counter ::", constants.Counter)
+	logs.InfoLog("Request recieved:: %v", req)
+	logs.InfoLog("Curent counter ::%v", constants.Counter)
 	encodedString := EncodeBase62(constants.Counter)
 
-	fmt.Println("Encoding string::", encodedString)
-	fmt.Println("COUNTER::", constants.Counter)
+	logs.InfoLog("Encoding string::%v", encodedString)
+	logs.InfoLog("COUNTER:: %v", constants.Counter)
 
 	//insert into DB
 	err := database.AddEntry(req.Url, encodedString)
@@ -80,11 +79,11 @@ func ShortenURLHandler(c *gin.Context) {
 		if strings.Contains(err.Error(), "Duplicate") {
 			shortUrl, err := database.GetShortUrl(req.Url)
 			if shortUrl == "" || err != nil {
-				fmt.Println("Error getting short url from database")
+				logs.ErrorLog("Error getting short url from database")
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Error getting short url"})
 				return
 			} else {
-				fmt.Println("Got short url from database")
+				logs.InfoLog("Got short url from database %v", shortUrl)
 				c.JSON(http.StatusOK, gin.H{"shortUrl": "localhost:8081/" + shortUrl})
 				return
 			}
@@ -103,7 +102,7 @@ func ShortenURLHandler(c *gin.Context) {
 
 	cacheEntryByte, err := json.Marshal(cacheEntry)
 	if err != nil {
-		fmt.Println("Failed to marshal cache entry")
+		logs.ErrorLog("Failed to marshal cache entry")
 	}
 	cacheEntryString := string(cacheEntryByte)
 	database.HSetShortLongMapping("url_mapping", encodedString, cacheEntryString)
@@ -141,5 +140,4 @@ func StatHandler(c *gin.Context) {
 
 	result := database.GetTop3()
 	c.JSON(http.StatusOK, gin.H{"result": result})
-
 }

@@ -16,6 +16,7 @@ FROM alpine:latest
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
+RUN mkdir -p /app/logs/
 # Copy the binary from the builder stage into the current working directory in the final image
 COPY --from=builder  /go/bin/main /app/main
 COPY --from=builder /go/bin/src/app/config/config.json /app/config/config.json

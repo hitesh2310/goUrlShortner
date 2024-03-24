@@ -6,7 +6,6 @@ Plan
             it will have payload like below 
                 {
                    url : "www.google.com"              // validation of valid URL 
-                   shortPattern : ""                //optional,   can use md5
                 }
   		
 

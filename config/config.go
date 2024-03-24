@@ -14,7 +14,7 @@ func SetUpApplication() {
 	fmt.Println("SetUp config details....")
 	setupConfig()
 	fmt.Println("SettingUp Logs....")
-	// setUpApplicationLogs()
+	setUpApplicationLogs()
 	setUpApplicationDatabase()
 	fmt.Println("DB set up done")
 	setUpRedis()

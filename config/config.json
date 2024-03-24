@@ -13,7 +13,7 @@
         "password": ""
       },
       "application" :{
-        "logPath":"/var/log/urlShortner/"
+        "logPath":"./logs/"
       }
   
   }
