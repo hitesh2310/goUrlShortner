@@ -18,7 +18,7 @@ func main() {
 	go func() {
 		database.UpdateCache()
 	}()
-	fmt.Println("Server starting!")
+	fmt.Println("Server starting 123!")
 	router := gin.Default()
 	router.GET("/stat", handlers.StatHandler)
 	router.POST("/shorten", handlers.ShortenURLHandler)
